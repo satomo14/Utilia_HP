@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>売上管理 - 美容サロン向け売上・実績管理アプリ</title>
+  <meta name="description" content="美容サロン・サービス業向けの売上・実績管理アプリ。スタッフの売上記録、給与計算、ダッシュボード分析をシンプルに。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:     #E91E8C;
+      --pink-lt:  #F06292;
+      --pink-bg:  #FFF0F7;
+      --dark:     #1A1A2E;
+      --gray:     #6B7280;
+      --light:    #F9FAFB;
+      --white:    #FFFFFF;
+      --radius:   16px;
+      --shadow:   0 4px 24px rgba(233,30,140,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      line-height: 1.7;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(233,30,140,.1);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--pink);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--dark); font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--pink); }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #fff0f7 0%, #fce4ec 50%, #f8bbd0 100%);
+      padding: 100px 5% 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+    .hero-text h1 span { color: var(--pink); }
+    .hero-text p {
+      font-size: 1.1rem;
+      color: var(--gray);
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .btn-group { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: .95rem; font-weight: 700;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(233,30,140,.25); }
+    .btn-primary { background: var(--pink); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--pink); border: 2px solid var(--pink); }
+    .btn svg { width: 22px; height: 22px; }
+
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .phone-mockup {
+      width: 260px;
+      background: var(--dark);
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.25);
+      position: relative;
+    }
+    .phone-screen {
+      background: #fff;
+      border-radius: 30px;
+      overflow: hidden;
+      aspect-ratio: 9/19;
+      display: flex; flex-direction: column;
+    }
+    .mock-status { background: var(--pink); height: 28px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; }
+    .mock-status span { color: #fff; font-size: .65rem; }
+    .mock-body { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; background: #fafafa; }
+    .mock-header { font-size: .75rem; font-weight: 700; color: var(--dark); }
+    .mock-card { background: #fff; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .mock-label { font-size: .6rem; color: var(--gray); margin-bottom: 2px; }
+    .mock-value { font-size: .95rem; font-weight: 900; color: var(--pink); }
+    .mock-bar-row { display: flex; gap: 4px; align-items: flex-end; height: 50px; margin-top: 6px; }
+    .mock-bar { flex: 1; border-radius: 4px 4px 0 0; }
+
+    /* ===== FEATURES ===== */
+    .features {
+      padding: 80px 5%;
+      background: var(--white);
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-title h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .section-title p { color: var(--gray); max-width: 520px; margin: 0 auto; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .feature-icon {
+      width: 52px; height: 52px;
+      background: var(--pink-bg);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+    .feature-card p { font-size: .9rem; color: var(--gray); }
+
+    /* ===== ROLES ===== */
+    .roles {
+      padding: 80px 5%;
+      background: linear-gradient(135deg, #fff0f7, #fce4ec);
+    }
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .role-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      box-shadow: var(--shadow);
+    }
+    .role-badge {
+      display: inline-block;
+      background: var(--pink);
+      color: #fff;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    .role-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; }
+    .role-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .role-list li { font-size: .9rem; color: var(--gray); display: flex; align-items: flex-start; gap: 8px; }
+    .role-list li::before { content: "✓"; color: var(--pink); font-weight: 700; flex-shrink: 0; }
+
+    /* ===== HOW IT WORKS ===== */
+    .howto {
+      padding: 80px 5%;
+      background: var(--white);
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+      counter-reset: step;
+    }
+    .step {
+      text-align: center;
+      padding: 0 12px;
+    }
+    .step-num {
+      width: 56px; height: 56px;
+      background: var(--pink);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 900;
+      margin: 0 auto 20px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: .88rem; color: var(--gray); }
+
+    /* ===== CTA ===== */
+    .cta {
+      padding: 80px 5%;
+      background: var(--pink);
+      text-align: center;
+      color: #fff;
+    }
+    .cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 900; margin-bottom: 12px; }
+    .cta p { font-size: 1rem; opacity: .85; margin-bottom: 36px; }
+    .btn-white {
+      background: #fff; color: var(--pink);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: 50px;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      margin: 0 8px;
+    }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+    .btn-outline-white {
+      background: transparent; color: #fff;
+      border: 2px solid rgba(255,255,255,.7);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 50px;
+      font-size: 1rem; font-weight: 700; text-decoration: none;
+      transition: background .2s, transform .2s;
+      margin: 0 8px;
+    }
+    .btn-outline-white:hover { background: rgba(255,255,255,.15); transform: translateY(-2px); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.6);
+      text-align: center;
+      padding: 36px 5%;
+      font-size: .85rem;
+    }
+    footer a { color: rgba(255,255,255,.8); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; text-align: center; }
+      .hero-visual { order: -1; }
+      .hero-text p { margin: 0 auto 36px; }
+      .btn-group { justify-content: center; }
+      nav { padding: 0 4%; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">売上管理</a>
+  <ul class="nav-links">
+    <li><a href="#features">機能</a></li>
+    <li><a href="#roles">対象ユーザー</a></li>
+    <li><a href="#howto">使い方</a></li>
+    <li><a href="#download">ダウンロード</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>サロンの売上を、<br><span>もっとシンプルに。</span></h1>
+    <p>スタッフの売上記録から給与計算、経営分析まで。美容サロン・サービス業に特化した、かんたん売上・実績管理アプリです。</p>
+    <div class="btn-group">
+      <a href="#download" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        App Store
+      </a>
+      <a href="#download" class="btn btn-secondary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.22.97.15l12.49-12.5L13 7.77 3.18 23.76zM20.7 10.67l-2.58-1.49-3.12 3.12 3.12 3.12 2.6-1.5c.74-.43.74-1.82-.02-2.25zM2.04 1.27C1.72 1.6 1.54 2.1 1.54 2.74v18.55c0 .64.18 1.14.5 1.47l.08.07 10.4-10.4v-.24L2.12 1.2l-.08.07zM16.6 20.41L4.1 12.92 13 7.77l3.61 3.6-2.63 2.63 2.63 2.63-.01-.02c.74.43.74 1.82 0 2.25l-.01.01z"/></svg>
+        Google Play
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="mock-status"><span>9:41</span></div>
+        <div class="mock-body">
+          <div class="mock-header">今月の売上</div>
+          <div class="mock-card">
+            <div class="mock-label">純売上合計</div>
+            <div class="mock-value">¥482,500</div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-label">スタッフ別ランキング</div>
+            <div class="mock-bar-row">
+              <div class="mock-bar" style="height:100%;background:#E91E8C;opacity:.9"></div>
+              <div class="mock-bar" style="height:75%;background:#E91E8C;opacity:.7"></div>
+              <div class="mock-bar" style="height:60%;background:#E91E8C;opacity:.5"></div>
+              <div class="mock-bar" style="height:45%;background:#E91E8C;opacity:.3"></div>
+            </div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-label">給与予定額（自分）</div>
+            <div class="mock-value" style="font-size:.8rem">¥138,720</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-title">
+    <h2>主な機能</h2>
+    <p>現場で本当に必要な機能だけを、シンプルにまとめました。</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>売上ダッシュボード</h3>
+      <p>7日間・30日間・今月など期間別に売上を自動集計。グラフで直感的に経営状況を把握できます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📝</div>
+      <h3>実績入力</h3>
+      <p>施術時間・支払い方法・指名の有無など、1件ごとの詳細を素早く記録。日別・月別の集計も自動で行います。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💰</div>
+      <h3>給与計算</h3>
+      <p>基本歩合・指名料フルバック・交通費を自動計算。スタッフ自身がいつでも給与予定額を確認できます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>スタッフ管理</h3>
+      <p>オーナー・マネージャー・スタッフの3段階の権限管理。アカウント作成・削除、給与条件の個別設定が可能。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <h3>レジ締め通知</h3>
+      <p>スタッフが締め作業を完了すると、管理者にプッシュ通知が届きます。締め忘れの防止にも役立ちます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📤</div>
+      <h3>CSVエクスポート</h3>
+      <p>売上データをCSVファイルに出力。会計ソフトや表計算ツールとの連携もスムーズに行えます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>予約媒体管理</h3>
+      <p>Instagram・電話予約など、予約媒体ごとの売上を分けて管理。チャネル別の集客効果も把握できます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>多言語対応</h3>
+      <p>日本語・英語・中国語（簡体字）に対応。外国籍スタッフが在籍するサロンでも安心して使えます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="roles" id="roles">
+  <div class="section-title">
+    <h2>スタッフもオーナーも使いやすい</h2>
+    <p>役割に応じた画面を用意しているので、誰でも迷わず使えます。</p>
+  </div>
+  <div class="roles-grid">
+    <div class="role-card">
+      <span class="role-badge">スタッフ</span>
+      <h3>自分の実績をいつでも確認</h3>
+      <ul class="role-list">
+        <li>1日の売上・施術実績を入力</li>
+        <li>指名率・給与予定額をリアルタイム確認</li>
+        <li>日別・月別の売上レポート表示</li>
+        <li>本日のレジ締め報告</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <span class="role-badge">オーナー / マネージャー</span>
+      <h3>店舗全体を一括管理</h3>
+      <ul class="role-list">
+        <li>スタッフ別売上ランキング</li>
+        <li>決済方法別割合グラフ</li>
+        <li>スタッフのアカウント・給与条件設定</li>
+        <li>レジ締め状況の確認・解除</li>
+        <li>CSVデータエクスポート</li>
+        <li>営業時間・店舗設定の管理</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="howto" id="howto">
+  <div class="section-title">
+    <h2>かんたん3ステップで始められる</h2>
+    <p>アプリをインストールしたら、すぐに使い始めることができます。</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>店舗を作成</h3>
+      <p>オーナーがアプリを起動し「新しい店舗を作成」をタップ。店舗のデータベースがすぐに用意されます。</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>スタッフアカウントを発行</h3>
+      <p>「スタッフ管理」からスタッフ用のIDとパスワードを作成。ログイン情報をスタッフに伝えるだけでOKです。</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>記録・分析スタート</h3>
+      <p>スタッフが日々の実績を入力するだけで、自動的に給与計算・売上分析が行われます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / DOWNLOAD -->
+<section class="cta" id="download">
+  <h2>まずは無料でお試しください</h2>
+  <p>iOS・Android 両対応。今すぐダウンロードして、サロン経営をもっとスマートに。</p>
+  <div>
+    <a href="https://apps.apple.com/jp/app/%E5%A3%B2%E4%B8%8A%E7%AE%A1%E7%90%86-%E5%BA%97%E8%88%97%E7%B5%8C%E5%96%B6%E3%82%92%E3%82%82%E3%81%A3%E3%81%A8%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%AB/id6760254356" class="btn-white" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      App Store でダウンロード
+    </a>
+    <a href="#" class="btn-outline-white">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.22.97.15l12.49-12.5L13 7.77 3.18 23.76zM20.7 10.67l-2.58-1.49-3.12 3.12 3.12 3.12 2.6-1.5c.74-.43.74-1.82-.02-2.25zM2.04 1.27C1.72 1.6 1.54 2.1 1.54 2.74v18.55c0 .64.18 1.14.5 1.47l.08.07 10.4-10.4v-.24L2.12 1.2l-.08.07zM16.6 20.41L4.1 12.92 13 7.77l3.61 3.6-2.63 2.63 2.63 2.63-.01-.02c.74.43.74 1.82 0 2.25l-.01.01z"/></svg>
+      Google Play でダウンロード
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    &copy; 2025 売上管理 &nbsp;|&nbsp;
+    <a href="#">プライバシーポリシー</a> &nbsp;|&nbsp;
+    <a href="#">お問い合わせ</a>
+  </p>
+</footer>
+
+</body>
+</html>
